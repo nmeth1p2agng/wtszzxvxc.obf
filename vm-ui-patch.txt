@@ -1,0 +1,71 @@
+VXC VM UI INTEGRATION PATCH
+===========================
+Target: wtszzxvxc.obf-main/index.html
+This patch adds a visible self-test panel for the existing Protection/vm.js prototype.
+It DOES NOT convert arbitrary Luau source into VM bytecode.
+
+1) Add this panel inside the existing <div class="grid"> ... </div>, for example after the 04 / VERIFICATION section:
+
+<section class="panel">
+  <div class="panelhead">
+    <h3>05 / VXC VM RUNTIME</h3>
+    <span class="sub" id="vmStatus">NOT RUN</span>
+  </div>
+  <p class="sub">Self-test untuk runtime VM prototype; bukan kompilasi source Luau.</p>
+  <div class="actions">
+    <button class="btn primary" id="vmTest">Run VM self-test</button>
+  </div>
+  <div class="log">
+    <h4>VM execution result</h4>
+    <div id="vmResult" class="logline">[ready] VM self-test belum dijalankan.</div>
+  </div>
+  <div class="note"><strong>Batasan:</strong> VM saat ini hanya mendukung instruksi demo yang didefinisikan di Protection/vm.js. Source Luau umum belum dikompilasi menjadi bytecode VXC.</div>
+</section>
+
+2) Before the page's existing inline <script> block, add this script tag so the VM runtime loads first:
+
+<script src="/Protection/vm.js"></script>
+
+If the site is deployed under a non-root path, use a relative path instead:
+<script src="Protection/vm.js"></script>
+
+3) At the end of the existing inline <script> block, add this handler:
+
+const vmTestButton = document.getElementById("vmTest");
+if (vmTestButton) {
+  vmTestButton.addEventListener("click", () => {
+    const status = document.getElementById("vmStatus");
+    const resultBox = document.getElementById("vmResult");
+    try {
+      if (!window.VXCVM) throw new Error("Protection/vm.js gagal dimuat.");
+      const program = {
+        version: 1,
+        constants: [7, 5, "VXC VM OK"],
+        registerCount: 3,
+        code: [
+          ["CONST", 0, 0],
+          ["CONST", 1, 1],
+          ["ADD", 2, 0, 1],
+          ["PRINT", 2],
+          ["CONST", 2, 2],
+          ["RETURN", 2]
+        ]
+      };
+      const run = window.VXCVM.runVXC(program);
+      if (run.output.length !== 1 || run.output[0] !== "12" || run.returned !== "VXC VM OK") {
+        throw new Error("Hasil VM tidak sesuai dengan hasil yang diharapkan.");
+      }
+      status.textContent = "PASS";
+      status.className = "sub status ok";
+      resultBox.className = "logline ok";
+      resultBox.textContent = `PASS · output=${JSON.stringify(run.output)} · return=${String(run.returned)} · steps=${run.steps}`;
+    } catch (error) {
+      status.textContent = "FAIL";
+      status.className = "sub status fail";
+      resultBox.className = "logline fail";
+      resultBox.textContent = `FAIL · ${error.message}`;
+    }
+  });
+}
+
+4) Make sure the file exists at Protection/vm.js in the deployed repository. Keep the existing VM source as JavaScript when deploying; this .txt patch is documentation only.
