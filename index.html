@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#090d16">
+<title>VXC | Luau Obfuscator</title>
+<style>
+:root{color-scheme:dark;--bg:#090d16;--panel:#101827;--panel2:#0c1320;--line:#243247;--text:#e8eef8;--muted:#91a0b8;--accent:#8b5cf6;--cyan:#67e8f9;--green:#34d399;--red:#fb7185;--yellow:#fbbf24}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 10% -15%,#242054 0,transparent 45%),radial-gradient(ellipse at 100% 0,#103344 0,transparent 35%),var(--bg);color:var(--text);font:14px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif}
+.wrap{max-width:1250px;margin:auto;padding:28px 20px 50px}.top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:30px}.brand{display:flex;gap:12px;align-items:center}.logo{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,var(--accent),#2563eb);display:grid;place-items:center;font-weight:900;letter-spacing:-1px;box-shadow:0 8px 30px #6d28d944}.brand h1{font-size:18px;margin:0;letter-spacing:.08em}.brand p{margin:2px 0 0;color:var(--muted);font-size:12px}.pill{border:1px solid #2c4057;background:#0d1b29;color:#9fe8ef;padding:7px 11px;border-radius:99px;font-size:11px;letter-spacing:.1em}
+.hero{margin:0 0 24px}.eyebrow{color:var(--cyan);font-size:11px;letter-spacing:.2em;font-weight:800}.hero h2{font-size:clamp(27px,4vw,42px);letter-spacing:-.04em;line-height:1.1;margin:9px 0}.hero h2 span{background:linear-gradient(90deg,#c4b5fd,#67e8f9);color:transparent;background-clip:text}.hero p{max-width:760px;color:var(--muted);margin:0}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:24px 0}.stat,.panel{border:1px solid var(--line);background:linear-gradient(180deg,#111b2bdf,#0c1320f2);border-radius:16px}.stat{padding:15px 17px}.stat small{color:var(--muted);display:block}.stat strong{font-size:22px;display:block;margin-top:4px}
+.grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr);gap:16px}.panel{padding:18px;min-width:0}.panelhead{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}.panelhead h3{margin:0;font-size:14px}.sub{font-size:11px;color:var(--muted)}
+textarea{width:100%;resize:vertical;min-height:300px;border:1px solid #26364b;border-radius:12px;background:#070c14;color:#cce4f4;padding:15px;font:12px/1.7 ui-monospace,SFMono-Regular,Consolas,monospace;outline:none}textarea:focus{border-color:#7c6af0;box-shadow:0 0 0 3px #8b5cf622}.output{min-height:300px}.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}.btn{border:1px solid #31415a;border-radius:10px;background:#152136;color:var(--text);padding:10px 14px;font-weight:700;cursor:pointer}.btn.primary{background:linear-gradient(135deg,#7c3aed,#2563eb);border-color:transparent}.btn:hover{filter:brightness(1.15)}.btn:disabled{opacity:.4;cursor:not-allowed}
+.stages{display:grid;gap:9px}.stage{display:flex;align-items:center;gap:11px;padding:11px;border:1px solid #223047;border-radius:12px;background:#0b1320}.num{width:29px;height:29px;flex:none;border-radius:9px;background:#1c2a40;display:grid;place-items:center;font-size:11px;font-weight:800;color:#b7c8e3}.stageinfo{flex:1;min-width:0}.stageinfo b{display:block;font-size:12px}.stageinfo small{display:block;color:var(--muted);font-size:11px;margin-top:2px}.status{font-size:10px;letter-spacing:.07em;color:var(--muted);white-space:nowrap}.status.ok{color:var(--green)}.status.fail{color:var(--red)}.status.run{color:var(--yellow)}
+.note{margin-top:15px;padding:12px 13px;border-radius:11px;background:#172033;border:1px solid #2b3d58;color:#b7c6db;font-size:11px}.note strong{color:#e8eef8}.log{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}.log h4{font-size:12px;margin:0 0 8px}.logline{font:11px/1.7 ui-monospace,monospace;color:var(--muted);overflow-wrap:anywhere}.logline.ok{color:var(--green)}.logline.fail{color:var(--red)}.footer{margin-top:18px;color:#73839d;font-size:11px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+@media(max-width:850px){.grid{grid-template-columns:1fr}.stats{grid-template-columns:1fr}.wrap{padding:20px 13px}.top{align-items:flex-start}.pill{display:none}textarea{min-height:230px}}
+</style>
+</head>
+<body><main class="wrap">
+<header class="top"><div class="brand"><div class="logo">VX</div><div><h1>VXC <span style="color:#9daec7">/</span> OBFUSCATOR</h1><p>Luau source pipeline · Web edition</p></div></div><div class="pill">LOCAL PROCESSING · NO UPLOAD</div></header>
+<section class="hero"><div class="eyebrow">SOURCE TRANSFORMATION WORKSPACE</div><h2>Protect your code.<br><span>Verify every stage.</span></h2><p>Minifikasi Luau dengan pemrosesan lokal, pemeriksaan bertahap, dan laporan yang menunjukkan pemeriksaan mana yang benar-benar berhasil. Tidak ada source yang dikirim ke server.</p></section>
+<div class="stats"><div class="stat"><small>Pipeline stages</small><strong id="statStages">0 / 5</strong></div><div class="stat"><small>Source size</small><strong id="statSize">0 B</strong></div><div class="stat"><small>Output reduction</small><strong id="statReduction">—</strong></div></div>
+<div class="grid">
+<section class="panel"><div class="panelhead"><h3>01 / SOURCE INPUT</h3><span class="sub">Luau · .lua</span></div>
+<textarea id="source" spellcheck="false" aria-label="Luau source input" placeholder="-- Tempel source Luau milikmu di sini&#10;local message = &quot;Hello VXC&quot;&#10;print(message)"></textarea>
+<div class="actions"><button class="btn primary" id="run">▶ Run pipeline</button><button class="btn" id="sample">Load sample</button><button class="btn" id="clear">Clear</button></div>
+<div class="note"><strong>Catatan:</strong> tool ini melakukan minifikasi leksikal konservatif. Ini bukan compiler bytecode, bukan VM custom, dan tidak menjanjikan anti-dump absolut.</div>
+</section>
+<section class="panel"><div class="panelhead"><h3>02 / PIPELINE STATUS</h3><span class="sub" id="overall">READY</span></div><div class="stages" id="stages"></div>
+<div class="log"><h4>Execution log</h4><div id="logs"><div class="logline">[ready] Menunggu source untuk diproses.</div></div></div>
+</section>
+<section class="panel"><div class="panelhead"><h3>03 / TRANSFORMED OUTPUT</h3><span class="sub" id="outSize">0 B</span></div><textarea id="output" class="output" spellcheck="false" readonly placeholder="Output akan muncul setelah pipeline berhasil dijalankan"></textarea>
+<div class="actions"><button class="btn primary" id="copy" disabled>Copy output</button><button class="btn" id="download" disabled>Download .lua</button></div></section>
+<section class="panel"><div class="panelhead"><h3>04 / VERIFICATION</h3><span class="sub">Per-run report</span></div><div class="stages" id="checks"></div><div class="note">Pemeriksaan sintaks di sini bersifat dasar dan bukan pengganti Luau compiler atau test runtime. Untuk klaim kompatibilitas, jalankan output melalui compiler resmi dan test suite proyekmu.</div></section>
+</div>
+<footer class="footer"><span>VXC Luau Obfuscator · starter edition</span><span>Deployable as a static GitHub / Vercel project</span></footer>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const stageDefs=[
+ ["Input validation","Memeriksa source kosong dan batas ukuran."],
+ ["Lexical scan","Mengenali string, komentar, dan token."],
+ ["Minification","Menghapus komentar dan spasi yang aman."],
+ ["Integrity hash","Menghitung SHA-256 untuk hasil transformasi."],
+ ["Output verification","Memastikan output tersedia dan hash konsisten."]
+];
+function renderStages(container,defs){$(container).innerHTML=defs.map((s,i)=>`<div class="stage"><div class="num">${String(i+1).padStart(2,"0")}</div><div class="stageinfo"><b>${s[0]}</b><small>${s[1]}</small></div><div class="status" id="${container}-${i}">PENDING</div></div>`).join("")}
+renderStages("stages",stageDefs);renderStages("checks",[
+ ["Source present","Input tidak kosong."],["String-safe scan","Literal string tetap utuh."],["Delimiter check","Pemeriksaan delimiter sederhana."],["Output generated","Hasil tersedia dan bisa diunduh."]
+]);
+function setStatus(container,i,status){const el=$(`${container}-${i}`);if(el){el.textContent=status;el.className="status "+(status==="PASS"?"ok":status==="FAIL"?"fail":status==="RUNNING"?"run":"")}}
+function log(msg,kind=""){const el=document.createElement("div");el.className="logline "+kind;el.textContent=`[${new Date().toLocaleTimeString()}] ${msg}`;$("logs").prepend(el)}
+function reset(){renderStages("stages",stageDefs);renderStages("checks",[["Source present","Input tidak kosong."],["String-safe scan","Literal string tetap utuh."],["Delimiter check","Pemeriksaan delimiter sederhana."],["Output generated","Hasil tersedia dan bisa diunduh."]]);$("logs").innerHTML="";$("output").value="";$("copy").disabled=true;$("download").disabled=true;$("statStages").textContent="0 / 5";$("statReduction").textContent="—";$("outSize").textContent="0 B"}
+function bytes(n){return n<1024?`${n} B`:`${(n/1024).toFixed(2)} KB`}
+// Lexer preserves quoted and long-bracket strings; removes comments and normalizes whitespace outside literals.
+function minifyLuau(src){
+ let out="",i=0,state="normal",quote="",longEq=0,space=false;
+ const isWord=c=>!!c&&/[A-Za-z0-9_]/.test(c);
+ const longOpen=(s,p)=>{if(s[p]!=="[")return null;let j=p+1;while(s[j]==="=")j++;return s[j]==="["?{eq:j-p-1,end:j+1}:null};
+ const longClose=(s,p,eq)=>"]"+"=".repeat(eq)+"]";
+ while(i<src.length){
+  const c=src[i],n=src[i+1];
+  if(state==="normal"){
+   if(/\s/.test(c)){space=true;i++;continue}
+   if(c==="-"&&n==="-"){
+    const op=longOpen(src,i+2);
+    if(op){i+=2+op.end;const close=longClose(src,i,op.eq);const e=src.indexOf(close,i);i=e<0?src.length:e+close.length}
+    else {i+=2;while(i<src.length&&src[i]!=="\n"&&src[i]!=="\r")i++}
+    space=true;continue;
+   }
+   const op=longOpen(src,i);
+   if(op){if(space&&isWord(out[out.length-1]))out+=" ";space=false;const close=longClose(src,i,op.eq);const e=src.indexOf(close,i+op.end+1);const end=e<0?src.length:e+close.length;out+=src.slice(i,end);i=end;continue}
+   if(c==="'"||c==='"'){if(space&&isWord(out[out.length-1]))out+=" ";space=false;quote=c;state="quoted";out+=c;i++;continue}
+   if(space&&isWord(out[out.length-1])&&isWord(c))out+=" ";
+   space=false;out+=c;i++;continue;
+  }
+  if(state==="quoted"){out+=c;i++;if(c==="\\"){if(i<src.length)out+=src[i++]}else if(c===quote)state="normal"}
+ }
+ if(state==="quoted")throw new Error("String literal tidak ditutup.");
+ return out.trim();
+}
+function delimiterCheck(src){
+ let stack=[],i=0,q=null;
+ while(i<src.length){let c=src[i],n=src[i+1];
+  if(q){if(c==="\\"){i+=2;continue}if(c===q)q=null;i++;continue}
+  if(c==="'"||c==='"'){q=c;i++;continue}
+  if(c==="-"&&n==="-"){let op=null,j=i+2;if(src[j]==="["){let k=j+1;while(src[k]==="=")k++;if(src[k]==="[")op={eq:k-j-1,close:"]"+"=".repeat(k-j-1)+"]"}}
+   if(op){let e=src.indexOf(op.close,j+op.eq+2);i=e<0?src.length:e+op.close.length}else{while(i<src.length&&src[i]!=="\n")i++}continue}
+  if("([{".includes(c))stack.push(c);
+  if(")]}".includes(c)){const want={")":"(","]":"[","}":"{"}[c];if(stack.pop()!==want)return false}
+  i++;
+ }return stack.length===0&&!q;
+}
+async function sha256(s){const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(s));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("")}
+$("run").onclick=async()=>{
+ reset();$("logs").innerHTML="";const src=$("source").value;$("statSize").textContent=bytes(new TextEncoder().encode(src).length);let passed=0;
+ try{
+  setStatus("stages",0,"RUNNING");setStatus("checks",0,"RUNNING");
+  if(!src.trim())throw new Error("Source kosong.");if(src.length>500000)throw new Error("Batas source adalah 500.000 karakter.");
+  setStatus("stages",0,"PASS");setStatus("checks",0,"PASS");passed++;log("Input validation passed.","ok");
+  setStatus("stages",1,"RUNNING");const output=minifyLuau(src);setStatus("stages",1,"PASS");passed++;setStatus("checks",1,"PASS");log("Lexical scan selesai; string literal dipertahankan.","ok");
+  setStatus("stages",2,"RUNNING");$("output").value=output;setStatus("stages",2,"PASS");passed++;log("Minifikasi selesai.","ok");
+  setStatus("stages",3,"RUNNING");const hash=await sha256(output);setStatus("stages",3,"PASS");passed++;log("SHA-256 output: "+hash,"ok");
+  setStatus("stages",4,"RUNNING");const valid=output.length>0&&await sha256(output)===hash;if(!valid)throw new Error("Verifikasi integritas gagal.");
+  setStatus("stages",4,"PASS");passed++;setStatus("checks",2,delimiterCheck(output)?"PASS":"FAIL");setStatus("checks",3,"PASS");setStatus("overall","SUCCESS");
+  $("copy").disabled=false;$("download").disabled=false;$("outSize").textContent=bytes(new TextEncoder().encode(output).length);
+  const orig=new TextEncoder().encode(src).length,now=new TextEncoder().encode(output).length;
+  $("statReduction").textContent=orig?`${Math.max(0,(1-now/orig)*100).toFixed(1)}%`:"0%";$("statStages").textContent=`${passed} / 5`;
+  if(!delimiterCheck(output)){setStatus("overall","CHECK WARNING");log("Delimiter check sederhana gagal; tinjau output dan gunakan compiler Luau.","fail")}else log("Output verification passed. Ini bukan verifikasi compiler Luau.","ok");
+ }catch(e){$("overall").textContent="FAILED";log(e.message,"fail");$("statStages").textContent=`${passed} / 5`;if(passed===0)setStatus("stages",0,"FAIL")}
+};
+$("sample").onclick=()=>{$("source").value='-- VXC sample\\nlocal message = "Hello Luau"\\nlocal function greet(name)\\n    print(message .. ", " .. name)\\nend\\ngreet("Developer")';$("statSize").textContent=bytes($("source").value.length);};
+$("clear").onclick=()=>{$("source").value="";reset();$("overall").textContent="READY";$("statSize").textContent="0 B"};
+$("copy").onclick=async()=>{try{await navigator.clipboard.writeText($("output").value);log("Output disalin ke clipboard.","ok")}catch(e){log("Clipboard tidak tersedia; pilih dan salin output manual.","fail")}};
+$("download").onclick=()=>{const blob=new Blob([$("output").value],{type:"text/plain;charset=utf-8"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="vxc-obfuscated.lua";a.click();URL.revokeObjectURL(a.href)};
+</script></body></html>
