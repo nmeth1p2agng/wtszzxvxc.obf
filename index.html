@@ -15,6 +15,8 @@ textarea{width:100%;resize:vertical;min-height:300px;border:1px solid #26364b;bo
 .stages{display:grid;gap:9px}.stage{display:flex;align-items:center;gap:11px;padding:11px;border:1px solid #223047;border-radius:12px;background:#0b1320}.num{width:29px;height:29px;flex:none;border-radius:9px;background:#1c2a40;display:grid;place-items:center;font-size:11px;font-weight:800;color:#b7c8e3}.stageinfo{flex:1;min-width:0}.stageinfo b{display:block;font-size:12px}.stageinfo small{display:block;color:var(--muted);font-size:11px;margin-top:2px}.status{font-size:10px;letter-spacing:.07em;color:var(--muted);white-space:nowrap}.status.ok{color:var(--green)}.status.fail{color:var(--red)}.status.run{color:var(--yellow)}
 .note{margin-top:15px;padding:12px 13px;border-radius:11px;background:#172033;border:1px solid #2b3d58;color:#b7c6db;font-size:11px}.note strong{color:#e8eef8}.log{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}.log h4{font-size:12px;margin:0 0 8px}.logline{font:11px/1.7 ui-monospace,monospace;color:var(--muted);overflow-wrap:anywhere}.logline.ok{color:var(--green)}.logline.fail{color:var(--red)}.footer{margin-top:18px;color:#73839d;font-size:11px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
 @media(max-width:850px){.grid{grid-template-columns:1fr}.stats{grid-template-columns:1fr}.wrap{padding:20px 13px}.top{align-items:flex-start}.pill{display:none}textarea{min-height:230px}}
+
+#vxc-compiler-panel{grid-column:1/-1}#vxc-compiler-panel textarea{min-height:180px}#vxcBytecode{min-height:230px}.vxc-result{white-space:pre-wrap;overflow-wrap:anywhere;background:#070c14;border:1px solid #26364b;border-radius:12px;padding:14px;min-height:90px;color:#cce4f4;font:12px/1.7 ui-monospace,SFMono-Regular,Consolas,monospace}
 </style>
 </head>
 <body><main class="wrap">
@@ -34,31 +36,15 @@ textarea{width:100%;resize:vertical;min-height:300px;border:1px solid #26364b;bo
 <div class="actions"><button class="btn primary" id="copy" disabled>Copy output</button><button class="btn" id="download" disabled>Download .lua</button></div></section>
 <section class="panel"><div class="panelhead"><h3>04 / VERIFICATION</h3><span class="sub">Per-run report</span></div><div class="stages" id="checks"></div><div class="note">Pemeriksaan sintaks di sini bersifat dasar dan bukan pengganti Luau compiler atau test runtime. Untuk klaim kompatibilitas, jalankan output melalui compiler resmi dan test suite proyekmu.</div></section>
 </div>
- 
-<section class="panel" id="vxc-compiler-panel">
-  <div class="panelhead">
-    <h3>05 / VXC SUBSET COMPILER</h3>
-    <span class="sub">Bytecode JSON · VM demo</span>
-  </div>
-
-  <p class="sub">
-    Kompilasi sintaks Lua sederhana yang didukung oleh compiler ini.
-  </p>
-
-  <div class="actions">
-    <button class="btn" id="vxcSample">Load compiler sample</button>
-    <button class="btn primary" id="vxcCompile">Compile + Run VM</button>
-    <button class="btn" id="vxcDownload" disabled>Download bytecode JSON</button>
-  </div>
-
-  <h4>Compiler output</h4>
-  <textarea id="vxcBytecode" spellcheck="false" readonly
-    placeholder="Bytecode JSON akan muncul di sini"></textarea>
-
-  <h4>VM execution result</h4>
-  <pre id="vxcResult" style="white-space:pre-wrap;overflow-wrap:anywhere"></pre>
+<section class="panel" id="vxc-compiler-panel" style="margin-top:16px">
+<div class="panelhead"><h3>05 / VXC SUBSET COMPILER</h3><span class="sub" id="vxcStatus">READY</span></div>
+<p class="sub">Compiler eksperimen untuk subset Lua yang kecil. Gunakan source sederhana; ini bukan compiler Luau resmi.</p>
+<div class="actions"><button class="btn" id="vxcSample" type="button">Load compiler sample</button><button class="btn primary" id="vxcCompile" type="button">Compile &amp; Run</button><button class="btn" id="vxcDownload" type="button" disabled>Download bytecode JSON</button></div>
+<div class="panelhead" style="margin-top:16px"><h3>Compiled program</h3><span class="sub">JSON instruction format</span></div>
+<textarea id="vxcBytecode" spellcheck="false" readonly placeholder="Bytecode JSON akan muncul di sini"></textarea>
+<div class="panelhead" style="margin-top:16px"><h3>VM result</h3></div><pre class="vxc-result" id="vxcResult">Tekan “Load compiler sample”, lalu “Compile &amp; Run”.</pre>
+<div class="note"><strong>Batasan:</strong> mendukung literal angka/string, assignment sederhana, print, return, aritmetika, tanda kurung, dan penggabungan string. Tidak mendukung seluruh sintaks Luau, Roblox API, atau bytecode Roblox. Output JSON adalah format instruksi demo VXC, bukan bytecode Roblox.</div>
 </section>
-
 <footer class="footer"><span>VXC Luau Obfuscator · starter edition</span><span>Deployable as a static GitHub / Vercel project</span></footer>
 </main>
 <script>
@@ -139,4 +125,11 @@ $("sample").onclick=()=>{$("source").value='-- VXC sample\\nlocal message = "Hel
 $("clear").onclick=()=>{$("source").value="";reset();$("overall").textContent="READY";$("statSize").textContent="0 B"};
 $("copy").onclick=async()=>{try{await navigator.clipboard.writeText($("output").value);log("Output disalin ke clipboard.","ok")}catch(e){log("Clipboard tidak tersedia; pilih dan salin output manual.","fail")}};
 $("download").onclick=()=>{const blob=new Blob([$("output").value],{type:"text/plain;charset=utf-8"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="vxc-obfuscated.lua";a.click();URL.revokeObjectURL(a.href)};
-</script></body></html>
+</script>
+<script src="Protection/vm.js"></script>
+<script src="compiler/lexer.js"></script>
+<script src="compiler/parser.js"></script>
+<script src="compiler/ir.js"></script>
+<script src="compiler/bytecode.js"></script>
+<script src="compiler/browser-bridge.js"></script>
+</body></html>
